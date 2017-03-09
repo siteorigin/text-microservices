@@ -14,10 +14,17 @@ from encoders import CBOW
 cbow_glove_model = CBOW()
 
 def test():
+    sent1 = 'hotels in New York'
+    sent2 = 'restaurants in New York'
+    logger.info("Test sentence1: %s", sent1)
+    logger.info("Test sentence2: %s", sent2)
+    logger.info("Start testing CBOW-Glove model...")
     model = cbow_glove_model
-    v1 = model.encode('hotels in New York')
-    v2 = model.encode('restaurants in New York')
-    print np.dot(v1, v2) / np.sqrt(np.dot(v1, v1) * np.dot(v2, v2))
+    v1 = model.encode(sent1)
+    v2 = model.encode(sent2)
+    cos = np.dot(v1, v2) / np.sqrt(np.dot(v1, v1) * np.dot(v2, v2))
+    logger.info("Cosine: %f", cos)
+    logger.info("End testing CBOW-Glove model.")
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
@@ -37,7 +44,6 @@ class MainHandler(tornado.web.RequestHandler):
 
         self.write(json.dumps(vector))
 
-
 if __name__ == '__main__':
     program = os.path.basename(sys.argv[0])
     logger = logging.getLogger(program)
@@ -45,6 +51,8 @@ if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s: %(levelname)s: %(message)s')
     logging.root.setLevel(level=logging.INFO)
     logger.info("Running %s" % ' '.join(sys.argv))
+
+    test()
 
     app = tornado.web.Application([
         (r"/", MainHandler),
