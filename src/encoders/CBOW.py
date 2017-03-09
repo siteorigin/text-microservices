@@ -14,6 +14,7 @@ class CBOW():
 
     Properties:
         idx2word: list of words in vocab(list)
+        words: word set for fast search
         word2idx: inverse vocab(dict)
         vectors: word vectors(2-D array, each row is a 300-dim vector of a word)
     """
