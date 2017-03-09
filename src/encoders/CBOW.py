@@ -8,6 +8,7 @@ from nltk import word_tokenize
 
 logger = logging.getLogger('cbow')
 logging.basicConfig(format='%(asctime)s: %(levelname)s: %(message)s')
+logging.root.setLevel(level=logging.INFO)
 
 class CBOW():
     """Basic sentence encoder using continuous bag-of-words.
@@ -20,7 +21,7 @@ class CBOW():
     """
     def __init__(self):
         cur_path = os.path.abspath(os.path.dirname(__file__))
-        model_path = os.path.join(cur_path, "../../models/cbow/glove.840B.300d.small.txt")
+        model_path = os.path.join(cur_path, "../../models/cbow/glove.840B.300d.txt")
         logger.info('loading %s, this will take a while...', model_path)
         self.idx2word = []
         self.vectors = []
@@ -43,6 +44,13 @@ class CBOW():
         self.vectors = self.vectors/norms
 
     def encode(self, raw_sent):
+	"""Encode a sentence to vector
+
+	Arguments:
+	    raw_sent: a sentence
+	Returns:
+	    300-dims numpy array
+      	"""
         sent = word_tokenize(raw_sent.lower())
         sent = [self.word2idx[w] for w in sent if w in self.words]
         sent_vec = self.vectors[sent]
