@@ -37,7 +37,7 @@ class Word2vec(object):
         self.words = set(self.idx2word)
         logger.info("Load done. Vocab size: %d", len(self.idx2word))
 
-        self.vec_path = os.path.join(cur_path, "../../models/cbow/glove.840B.300d.vector.txt")
+        self.vec_path = os.path.join(cur_path, "../../models/cbow/glove.840B.300d.txt")
         # make sure vector number equal vocab size
         with open(self.vec_path) as fp:
             num_lines = sum([1 for line in fp])
@@ -84,7 +84,9 @@ class Word2vec(object):
             with open(self.vec_path) as fp:
                 for line_num, line in enumerate(fp):
                     if line_num in w_not_hit.keys():
-                        vec = np.array([float(num) for num in line.split(' ')])
+                        vec = np.array([float(num) for num in line.split(' ')[1:]])
+                        if len(vec) != 300:
+                            vec = np.random.rand(300)
                         self.cache[line_num] = vec # put into cache
                         for idx in w_not_hit[line_num]: # put into result
                             result[idx] = vec
