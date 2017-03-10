@@ -4,6 +4,7 @@
 import os
 import logging
 import numpy as np
+from collections import defaultdict
 from FifoCache import FifoCache
 
 logger = logging.getLogger(__name__)
@@ -46,38 +47,53 @@ class Word2vec(object):
         # init a cache for vectors
         self.cache = FifoCache(cache_size)
 
-    def get_vec(self, w):
-	"""Get vector of word w
+    def get_vec(self, sent):
+	"""Get vectors of words in sentence
 
 	Arguments:
-	    w: a word
+	    sentence: a list of word(lower case)
 	Returns:
 	    word vector
       	"""
 
+        result = [None] * len(sent)
+
         # return a random vector if not found, otherwise convert to idx
-        if w not in self.words:
-            return np.random.rand(300)
-        w = self.word2idx[w.strip().lower().decode('utf-8')]
+        w_not_hit = defaultdict(list) # there may be repeat words, so we use list
+        for idx,w in enumerate(sent):
+            try:
+                w = w.decode('utf-8')
+            except:
+                pass
 
-        # find in cache firstly
-        if self.cache.has_key(w):
-            return self.cache[w]
+            if w not in self.words:
+                # logger.debug("%s not in vocab, generate random vector", w)
+                result[idx] = np.random.rand(300)
+            else:
+                w = self.word2idx[w] # convert word to idx now
+                # find in cache firstly, record idx if not found
+                if self.cache.has_key(w):
+                    logger.debug("%s: hit in cache", self.idx2word[w])
+                    result[idx] = self.cache[w]
+                else:
+                    logger.debug("%s: not in cache", self.idx2word[w])
+                    w_not_hit[w].append(idx)
 
-        # not hit in cache, find in file
-        vec = None
-        with open(self.vec_path) as fp:
-            for i, line in enumerate(fp):
-                if i == w:
-                    vec = np.array([float(num) for num in line.split(' ')])
-        if vec is None or len(vec) != 300:
-            vec = np.random.rand(300)
-
-        # put into cache and return
-        self.cache[w] = vec
-        return vec
+        # some words not hit in cache, find in file
+        if len(w_not_hit) > 0:
+            with open(self.vec_path) as fp:
+                for line_num, line in enumerate(fp):
+                    if line_num in w_not_hit.keys():
+                        vec = np.array([float(num) for num in line.split(' ')])
+                        self.cache[line_num] = vec # put into cache
+                        for idx in w_not_hit[line_num]: # put into result
+                            result[idx] = vec
+                        w_not_hit.pop(line_num) # remove from candidate
+                        if len(w_not_hit) == 0: # stop search if all vector found
+                            break
+        return result
 
 if __name__=='__main__':
-    w2v = Word2vec(cache_size=100)
-    for x in xrange(10000):
-        vec = w2v.get_vec(str(x))
+    w2v = Word2vec(cache_size=11)
+    for x in xrange(100):
+        vec = w2v.get_vec([str(num) for num in list(range(x, x+10))])

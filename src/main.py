@@ -18,7 +18,7 @@ logging.root.setLevel(level=logging.DEBUG)
 cbow_glove_model = CBOW()
 
 def test():
-    sent1 = 'hotels in New York'
+    sent1 = 'hotels in new york'
     sent2 = 'restaurants in New York'
     logger.debug("Test sentence1: %s", sent1)
     logger.debug("Test sentence2: %s", sent2)

@@ -35,6 +35,6 @@ class CBOW(object):
         if len(sent) == 0:
             return np.random.rand(300)
         else:
-            sent_vec = [self.w2v.get_vec(w) for w in sent]
+            sent_vec = self.w2v.get_vec(sent)
             return np.mean(sent_vec, axis=0)
 
