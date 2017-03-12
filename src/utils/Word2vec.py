@@ -53,7 +53,7 @@ class Word2vec(object):
 	Arguments:
 	    sentence: a list of word(lower case)
 	Returns:
-	    word vector
+	    2-D array, each line is the vector of the each word, but out-of-vocab word will be None
       	"""
 
         result = [None] * len(sent)
@@ -67,8 +67,8 @@ class Word2vec(object):
                 pass
 
             if w not in self.words:
-                # logger.debug("%s not in vocab, generate random vector", w)
-                result[idx] = np.random.rand(300)
+                # we simply ignore words not in vocab for the moment.
+                continue
             else:
                 w = self.word2idx[w] # convert word to idx now
                 # find in cache firstly, record idx if not found

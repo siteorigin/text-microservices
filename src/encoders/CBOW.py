@@ -33,8 +33,12 @@ class CBOW(object):
       	"""
         sent = word_tokenize(raw_sent.lower())
         if len(sent) == 0:
-            return np.random.rand(300)
+            return None, 'The sentence is empty.'
         else:
             sent_vec = self.w2v.get_vec(sent)
-            return np.mean(sent_vec, axis=0)
+            sent_vec = [vec for vec in sent_vec if vec is not None]
+            if len(sent_vec) == 0:
+                return None, 'All words are out-of-vocab.'
+            else:
+                return np.mean(sent_vec, axis=0), 'Success'
 

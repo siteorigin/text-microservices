@@ -24,8 +24,9 @@ def test():
     logger.debug("Test sentence2: %s", sent2)
     logger.debug("Start testing CBOW-Glove model...")
     model = cbow_glove_model
-    v1 = model.encode(sent1)
-    v2 = model.encode(sent2)
+    v1,_ = model.encode(sent1)
+    v2,_ = model.encode(sent2)
+    print v1, v2
     cos = np.dot(v1, v2) / np.sqrt(np.dot(v1, v1) * np.dot(v2, v2))
     logger.debug("Cosine: %f", cos)
     logger.debug("End testing CBOW-Glove model.")
@@ -35,15 +36,25 @@ class MainHandler(tornado.web.RequestHandler):
         self.post()
 
     def post(self):
-        req_text = self.get_argument('text', 'hello world')
+        req_text = self.get_argument('text', '')
         req_type = self.get_argument('type', 'text')
         req_model = self.get_argument('model', 'cbow-glove')
+
+        respone = {}
+        model = None
         if req_model == 'cbow-glove':
             model = cbow_glove_model
         else:
-            model = cbow_glove_model
-        vector = [float(x) for x in model.encode(req_text)]
-        self.write(json.dumps(vector))
+            respone = {'status': 1, 'msg': 'Model not found.'}
+
+        if model is not None:
+            vector, msg = model.encode(req_text)
+            if vector is None:
+                respone = {'status': 1, 'msg': msg}
+            else:
+                respone = {'status': 0, 'msg': msg}
+                respone['features'] = [float(x) for x in vector]
+        self.write(json.dumps(respone))
 
 if __name__ == '__main__':
     logger.info("Running %s" % ' '.join(sys.argv))
