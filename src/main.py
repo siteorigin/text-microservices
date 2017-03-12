@@ -24,9 +24,8 @@ def test():
     logger.debug("Test sentence2: %s", sent2)
     logger.debug("Start testing CBOW-Glove model...")
     model = cbow_glove_model
-    v1,_ = model.encode(sent1)
-    v2,_ = model.encode(sent2)
-    print v1, v2
+    v1,_,_,_ = model.encode(sent1)
+    v2,_,_,_ = model.encode(sent2)
     cos = np.dot(v1, v2) / np.sqrt(np.dot(v1, v1) * np.dot(v2, v2))
     logger.debug("Cosine: %f", cos)
     logger.debug("End testing CBOW-Glove model.")
@@ -40,33 +39,45 @@ class MainHandler(tornado.web.RequestHandler):
         req_type = self.get_argument('type', 'text')
         req_model = self.get_argument('model', 'cbow-glove')
 
-        respone = {}
+        response = {}
         model = None
         if req_model == 'cbow-glove':
             model = cbow_glove_model
         else:
-            respone = {'status': 1, 'msg': 'Model not found.'}
+            response = {'status': 1, 'msg': 'Model not found.'}
 
         if model is not None:
-            vector, msg = model.encode(req_text)
+            vector, sents, sents_vec, sents_sim = model.encode(req_text)
             if vector is None:
-                respone = {'status': 1, 'msg': msg}
+                response = {'status': 1}
             else:
-                respone = {'status': 0, 'msg': msg}
-                respone['features'] = [float(x) for x in vector]
-        self.write(json.dumps(respone))
+                response = {'status': 0}
+                response['features'] = [float(x) for x in vector]
+                response['sentences'] = []
+                for sent, sent_vec, sent_sim in zip(sents, sents_vec, sents_sim):
+                    if sent_vec is None:
+                        tmp_res = {'status': 1}
+                        tmp_res['text'] = sent
+                    else:
+                        tmp_res = {'status': 0}
+                        tmp_res['text'] = sent
+                        tmp_res['features'] = [float(x) for x in sent_vec]
+                        tmp_res['salience'] = sent_sim
+                    response['sentences'].append(tmp_res)
+        self.write(json.dumps(response))
 
 if __name__ == '__main__':
     logger.info("Running %s" % ' '.join(sys.argv))
-
     test()
 
     port = 8888
-    logger.info("Listening on port %s" % port)
-    app = tornado.web.Application([
-        (r"/", MainHandler),
-        ])
+    handlers = [
+            (r"/", MainHandler),
+            ]
+    app = tornado.web.Application(handlers,
+            autoreload=True)
     app.listen(port)
+    logger.info("Listening on port %s" % port)
     tornado.ioloop.IOLoop.current().start()
 
 

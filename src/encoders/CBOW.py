@@ -9,21 +9,23 @@ from nltk import word_tokenize
 
 sys.path.append('../utils')
 from utils import Word2vec
+from Text2vecBase import Text2vecBase
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='%(asctime)s: %(levelname)s: %(message)s')
 logging.root.setLevel(level=logging.INFO)
 
-class CBOW(object):
+class CBOW(Text2vecBase):
     """Basic sentence encoder using continuous bag-of-words.
 
     Properties:
         w2v: Word2vec class
     """
     def __init__(self):
+        super(CBOW, self).__init__()
         self.w2v = Word2vec(cache_size=1000)
 
-    def encode(self, raw_sent):
+    def encode_sent(self, raw_sent):
 	"""Encode a sentence to vector
 
 	Arguments:
@@ -32,13 +34,10 @@ class CBOW(object):
 	    300-dims numpy array
       	"""
         sent = word_tokenize(raw_sent.lower())
-        if len(sent) == 0:
-            return None, 'The sentence is empty.'
+        sent_vec = self.w2v.get_vec(sent)
+        sent_vec = [vec for vec in sent_vec if vec is not None]
+        if len(sent_vec) == 0:
+            return None
         else:
-            sent_vec = self.w2v.get_vec(sent)
-            sent_vec = [vec for vec in sent_vec if vec is not None]
-            if len(sent_vec) == 0:
-                return None, 'All words are out-of-vocab.'
-            else:
-                return np.mean(sent_vec, axis=0), 'Success'
+            return np.mean(sent_vec, axis=0)
 
