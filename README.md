@@ -28,7 +28,7 @@ To deploy on Google App Engine, use `src/app.yaml`.
 
 ## Document
 
-The API support both `GET` and `POST`, the arguments are:
+The API support both `GET`(url parameters) and `POST`(request in json format), the arguments are:
 
 1. `text` the text to be encoded
 2. `type` only `text` is supported for now

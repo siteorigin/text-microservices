@@ -32,6 +32,10 @@ def test():
     logger.debug("Cosine: %f", cos)
     logger.debug("End testing CBOW-Glove model.")
 
+@app.route("/_ah/health")
+def check():
+    return 'aha'
+
 @app.route("/", methods=['GET', 'POST'])
 def main():
     if request.method == 'POST':
