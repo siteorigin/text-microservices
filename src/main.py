@@ -35,14 +35,14 @@ def test():
 @app.route("/", methods=['GET', 'POST'])
 def main():
     if request.method == 'POST':
-        req_text = request.values.get('text', '')
-        req_type = request.values.get('type', 'text')
-        req_model = request.values.get('model', 'cbow-glove')
+        data = request.get_json()
+        req_text = data.get('text', '')
+        req_type = data.get('type', 'text')
+        req_model = data.get('model', 'cbow-glove')
     else:
         req_text = request.args.get('text', '')
         req_type = request.args.get('type', 'text')
         req_model = request.args.get('model', 'cbow-glove')
-
 
     response = {}
     model = None
