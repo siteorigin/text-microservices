@@ -1,0 +1,3 @@
+[submodule "train_src/skip-thought-tf"]
+	path = train_src/skip-thought-tf
+	url = https://github.com/zhangzibin/skip-thought-tf
