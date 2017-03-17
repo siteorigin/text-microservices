@@ -47,6 +47,11 @@ If `--auth` is used, you should provide these arguments:
 
 Return data will in json format.
 ```
+// In the case of login fail
+{
+	'status' : -1
+}
+
 // In the case of error in encoder
 {
 	'status' : 1
