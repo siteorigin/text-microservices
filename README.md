@@ -19,9 +19,14 @@ Download Glove and some preprocess:
 >>> awk '{print $1}' glove.840B.300d.txt > glove.840B.300d.vocab.txt
 ```
 
-Start Tornado server, simply cd into `src` and run, the API will listen on `127.0.0.1:5000`
+Start Flask server, simply cd into `src` and run, the API will listen on `127.0.0.1:5000`
 ```
 python main.py
+```
+
+To deploy with authorization:
+```
+python main.py --auth
 ```
 
 To deploy on Google App Engine, use `src/app.yaml`.
@@ -30,9 +35,15 @@ To deploy on Google App Engine, use `src/app.yaml`.
 
 The API support both `GET`(url parameters) and `POST`(request in json format), the arguments are:
 
-1. `text` the text to be encoded
-2. `type` only `text` is supported for now
-3. `model` the encoder model, only `cbow-glove` is supported for the moment
+1. `text`: the text to be encoded
+2. `type`: only `text` is supported for now
+3. `model`: the encoder model, only `cbow-glove` is supported for the moment
+
+If `--auth` is used, you should provide these arguments:
+
+1. `user_email`: The user's email address. For security this should always be sent as an MD5 encoded string.
+2. `key`: a key return by SiteOrigin.com 
+3. `key_expire`: an expiry timestamp for the key
 
 Return data will in json format.
 ```

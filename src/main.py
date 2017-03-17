@@ -4,7 +4,10 @@
 import os
 import sys
 import json
+import time
+import hashlib
 import logging
+import argparse
 import numpy as np
 from flask import Flask
 from flask import request
@@ -16,6 +19,11 @@ app = Flask(__name__)
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='%(asctime)s: %(levelname)s: %(message)s')
 logging.root.setLevel(level=logging.DEBUG)
+
+parser = argparse.ArgumentParser(description="Text Microservice.")
+group = parser.add_mutually_exclusive_group()
+group.add_argument("-a", "--auth", action="store_true")
+args = parser.parse_args()
 
 cbow_glove_model = CBOW()
 
@@ -36,8 +44,33 @@ def test():
 def check():
     return 'aha'
 
+def auth():
+    AUTH_SALT = 'aaabbbccc';
+    if request.method == 'POST':
+        data = request.get_json()
+    else:
+        data = request.args
+    if data.has_key('user_email') and data.has_key('key_expire') and data.has_key('key'):
+        user_email = data['user_email']
+        key_expire = data['key_expire']
+        key = data['key']
+        print hashlib.sha1(AUTH_SALT + user_email + key_expire).hexdigest()
+        print key
+        if len(user_email) == 0 or int(time.time()) > int(key_expire):
+            return False
+        elif key == hashlib.sha1(AUTH_SALT + user_email + key_expire).hexdigest():
+            return True
+        else:
+            return False
+    else:
+        return False
+
 @app.route("/", methods=['GET', 'POST'])
 def main():
+    if args.auth and not auth():
+        response = {'status': -1, 'msg': 'Login fail.'}
+        return json.dumps(response)
+
     if request.method == 'POST':
         data = request.get_json()
         req_text = data.get('text', '')
