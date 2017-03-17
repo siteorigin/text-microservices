@@ -7,7 +7,6 @@ import json
 import time
 import hashlib
 import logging
-import argparse
 import numpy as np
 from flask import Flask
 from flask import request
@@ -19,11 +18,6 @@ app = Flask(__name__)
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='%(asctime)s: %(levelname)s: %(message)s')
 logging.root.setLevel(level=logging.DEBUG)
-
-parser = argparse.ArgumentParser(description="Text Microservice.")
-group = parser.add_mutually_exclusive_group()
-group.add_argument("-a", "--auth", action="store_true")
-args = parser.parse_args()
 
 cbow_glove_model = CBOW()
 
@@ -67,7 +61,7 @@ def auth():
 
 @app.route("/", methods=['GET', 'POST'])
 def main():
-    if args.auth and not auth():
+    if os.environ.has_key('SONAR_AUTH_REQUESTS') and not auth():
         response = {'status': -1, 'msg': 'Login fail.'}
         return json.dumps(response)
 
