@@ -12,14 +12,16 @@ from flask import Flask
 from flask import request
 
 from encoders import CBOW
+from encoders import SkipThought
 
 app = Flask(__name__)
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s: %(levelname)s: %(message)s')
-logging.root.setLevel(level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s: %(message)s')
+logging.root.setLevel(level=logging.INFO)
 
 cbow_glove_model = CBOW()
+skip_thought_model = SkipThought()
 
 def test():
     sent1 = 'hotels in new york'
@@ -77,6 +79,8 @@ def main():
     model = None
     if req_model == 'cbow-glove':
         model = cbow_glove_model
+    if req_model == 'skip-thought':
+        model = skip_thought_model
     else:
         response = {'status': 1, 'msg': 'Model not found.'}
 

@@ -12,8 +12,6 @@ from utils import Word2vec
 from utils.helper import vec_sim
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s: %(levelname)s: %(message)s')
-logging.root.setLevel(level=logging.INFO)
 
 class Text2vecBase(object):
     """A base class for Text2vec
@@ -39,7 +37,7 @@ class Text2vecBase(object):
 
       	"""
         sents = sent_tokenize(doc.strip())
-        sents_vec = [self.encode_sent(sent) for sent in sents]
+        sents_vec = self.encode_sents(sents)
         sents_vec_clean = [vec for vec in sents_vec if vec is not None]
         if len(sents_vec_clean) == 0:
             return None, None, None, None
@@ -49,6 +47,18 @@ class Text2vecBase(object):
             sents_sim_clean = [vec for vec in sents_sim if vec is not None]
             doc_vec = np.average(sents_vec_clean, axis=0, weights=sents_sim_clean)
             return doc_vec, sents, sents_vec, sents_sim
+
+    def encode_sents(self, sents):
+        """Encode many sentences to vectors
+        This is a base class for sentence encoders, So we don't implement the method here.
+        we simply return a random vector.
+
+	Arguments:
+	    sents: sentences
+	Returns:
+	    list of 300-dims numpy array
+      	"""
+        return [self.encode_sent(sent) for sent in sents]
 
     def encode_sent(self, raw_sent):
         """Encode a sentence to vector

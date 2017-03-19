@@ -12,8 +12,6 @@ from utils import Word2vec
 from Text2vecBase import Text2vecBase
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s: %(levelname)s: %(message)s')
-logging.root.setLevel(level=logging.INFO)
 
 class CBOW(Text2vecBase):
     """Basic sentence encoder using continuous bag-of-words.

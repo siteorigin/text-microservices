@@ -8,8 +8,6 @@ from collections import defaultdict
 from FifoCache import FifoCache
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s: %(levelname)s: %(message)s')
-logging.root.setLevel(level=logging.INFO)
 
 class Word2vec(object):
     """Word2vec loader and getter
