@@ -10,7 +10,7 @@ Install python modules and nltk data for tokenizer:
 >>> python -m nltk.downloader 'punkt'
 ```
 
-Download Glove and some preprocess:
+Model files for `cbow-glove`, download Glove and preprocessing:
 
 ```shell
 >>> mkdir -p models/cbow/
@@ -18,6 +18,8 @@ Download Glove and some preprocess:
 >>> cd models/cbow/ && unzip glove.840B.300d.zip
 >>> awk '{print $1}' glove.840B.300d.txt > glove.840B.300d.vocab.txt
 ```
+
+Model files for `skip-thought`, simply put the trained model files into `models/skip-thought`
 
 Start Flask server, simply cd into `src` and run, the API will listen on `127.0.0.1:5000`
 ```
