@@ -1,3 +1,6 @@
 [submodule "train_src/skip-thought-tf"]
 	path = train_src/skip-thought-tf
 	url = https://github.com/zhangzibin/skip-thought-tf
+[submodule "train_src/lstm-char-cnn-tensorflow"]
+	path = train_src/lstm-char-cnn-tensorflow
+	url = https://github.com/zhangzibin/lstm-char-cnn-tensorflow.git
