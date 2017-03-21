@@ -23,19 +23,6 @@ logging.root.setLevel(level=logging.INFO)
 cbow_glove_model = CBOW()
 skip_thought_model = SkipThought()
 
-def test():
-    sent1 = 'hotels in new york'
-    sent2 = 'restaurants in New York'
-    logger.debug("Test sentence1: %s", sent1)
-    logger.debug("Test sentence2: %s", sent2)
-    logger.debug("Start testing CBOW-Glove model...")
-    model = cbow_glove_model
-    v1,_,_,_ = model.encode(sent1)
-    v2,_,_,_ = model.encode(sent2)
-    cos = np.dot(v1, v2) / np.sqrt(np.dot(v1, v1) * np.dot(v2, v2))
-    logger.debug("Cosine: %f", cos)
-    logger.debug("End testing CBOW-Glove model.")
-
 @app.route("/_ah/health")
 def check():
     return 'aha'
@@ -50,8 +37,6 @@ def auth():
         user_email = data['user_email']
         key_expire = data['key_expire']
         key = data['key']
-        print hashlib.sha1(AUTH_SALT + user_email + key_expire).hexdigest()
-        print key
         if len(user_email) == 0 or int(time.time()) > int(key_expire):
             return False
         elif key == hashlib.sha1(AUTH_SALT + user_email + key_expire).hexdigest():
@@ -106,5 +91,4 @@ def main():
 
 if __name__ == '__main__':
     logger.info("Running %s" % ' '.join(sys.argv))
-    test()
     app.run()
