@@ -77,10 +77,21 @@ if __name__ == '__main__':
     inp, outp = sys.argv[1:3]
     i = 0
 
+    use_vocab = True
+    if use_vocab:
+        max_words = 10000
+        with open('../data/vocab.txt') as f:
+            idx2word = [w.strip() for w in f.readlines()]
+        word2idx = dict([(w,idx) for idx,w in enumerate(idx2word)])
+        words = set(idx2word)
+
     output = codecs.open(outp, 'w', 'utf-8')
     wiki = MyWikiCorpus(inp, lemmatize=False, dictionary={})
     for text in wiki.get_texts():
-        sents = [' '.join(sent) for sent in text]
+        if use_vocab:
+            sents = [' '.join([w if w in words else '<unk>' for w in sent]) for sent in text]
+        else:
+            sents = [' '.join(sent) for sent in text]
         output.write('\n'.join(sents) + '\n\n')
         i = i + 1
         if (i % 10000 == 0):
