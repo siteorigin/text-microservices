@@ -13,13 +13,22 @@ Install python modules and nltk data for tokenizer:
 Model files for `cbow-glove`, download Glove and preprocessing:
 
 ```shell
->>> mkdir -p models/cbow/
->>> wget http://nlp.stanford.edu/data/glove.840B.300d.zip -P models/cbow/
->>> cd models/cbow/ && unzip glove.840B.300d.zip
+>>> mkdir -p ./models/cbow/
+>>> wget http://nlp.stanford.edu/data/glove.840B.300d.zip -P ./models/cbow/
+>>> cd ./models/cbow/
+>>> unzip glove.840B.300d.zip
+>>> rm glove.840B.300d.zip
 >>> awk '{print $1}' glove.840B.300d.txt > glove.840B.300d.vocab.txt
 ```
 
-Model files for `skip-thought`, simply put the trained model files into `models/skip-thought`
+Model files for `skip-thought`:
+```shell
+>>> wget "http://download.tensorflow.org/models/skip_thoughts_uni_2017_02_02.tar.gz" -P ./models
+>>> cd ./models
+>>> tar -xvf skip_thoughts_uni_2017_02_02.tar.gz
+>>> rm skip_thoughts_uni_2017_02_02.tar.gz
+```
+
 
 Start Flask server, simply cd into `src` and run, the API will listen on `127.0.0.1:5000`
 ```
