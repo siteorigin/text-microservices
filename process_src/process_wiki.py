@@ -79,7 +79,6 @@ if __name__ == '__main__':
 
     use_vocab = True
     if use_vocab:
-        max_words = 10000
         with open('../data/vocab.txt') as f:
             idx2word = [w.strip() for w in f.readlines()]
         word2idx = dict([(w,idx) for idx,w in enumerate(idx2word)])
