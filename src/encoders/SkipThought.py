@@ -31,7 +31,6 @@ class SkipThought(Text2vecBase):
     Properties:
         encoder: the sentence encoder model
         char_w2v: the word2vec model for out-of-vocab words
-
     """
     def __init__(self):
         super(SkipThought, self).__init__()
@@ -41,7 +40,7 @@ class SkipThought(Text2vecBase):
         VOCAB_FILE = os.path.join(cur_path, "../../models/skip_thoughts_uni_2017_02_02/vocab.txt")
         EMBEDDING_MATRIX_FILE = os.path.join(cur_path, "../../models/skip_thoughts_uni_2017_02_02/embeddings.npy")
         CHECKPOINT_PATH = os.path.join(cur_path, "../../models/skip_thoughts_uni_2017_02_02/model.ckpt-501424")
-        PROJ_MODEL_PATH = os.path.join(cur_path, "../../models/linear_projection.m")
+        PROJ_MODEL_PATH = os.path.join(cur_path, "../../models/char_word2vec/skip-thought_linear_projection.m")
 
         self.encoder = encoder_manager.EncoderManager()
         self.encoder.load_model(configuration.model_config(),

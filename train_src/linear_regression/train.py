@@ -3,15 +3,16 @@ import pickle
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-vocab_file = '../../models/skip_thoughts_uni_2017_02_02/vocab.txt'
-source_vec_file = '../../data/char_embedding.npy'
-target_vec_file = '../../models/skip_thoughts_uni_2017_02_02/embeddings.npy'
 
 def vec_sim(v1, v2):
     cos = np.dot(v1, v2) / np.sqrt(np.dot(v1, v1) * np.dot(v2, v2))
     return (cos + 1) / 2
 
 def train():
+    vocab_file = '../../models/skip_thoughts_uni_2017_02_02/vocab.txt'
+    source_vec_file = '../../data/char_embedding.npy'
+    target_vec_file = '../../models/skip_thoughts_uni_2017_02_02/embeddings.npy'
+
     with open(vocab_file) as f:
         vocab = f.readlines()
         vocab = [w.strip().lower() for w in vocab]
@@ -26,10 +27,10 @@ def train():
 
     proj_model = LinearRegression(n_jobs=4)
     proj_model.fit(source_vec, target_vec)
-    with open('../../models/linear_projection.m', 'w') as f:
+    with open('../../models/skip-thought_linear_projection.m', 'w') as f:
         pickle.dump(proj_model, f)
 
-def test(test_idx = 88):
+    # TEST ONLY!
     with open(vocab_file) as f:
         vocab = f.readlines()
         vocab = [w.strip().lower() for w in vocab][:500]
@@ -52,4 +53,3 @@ def test(test_idx = 88):
 
 if __name__ == '__main__':
     train()
-    test(111)

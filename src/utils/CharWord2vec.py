@@ -76,11 +76,11 @@ class CharWord2vec(object):
                             kernel_features=eval(FLAGS.kernel_features),
                             num_unroll_steps=FLAGS.num_unroll_steps,
                             dropout=0)
-                    global_step = tf.Variable(0, dtype=tf.int32, name='global_step')
 
                     saver = tf.train.Saver()
                     saver.restore(self.session, ckp_file)
-                    logger.info('Loaded model from', ckp_file, 'saved at global step', global_step.eval())
+
+                    logger.info('Loaded model from %s', ckp_file)
 
         if proj is None:
             self.proj = proj

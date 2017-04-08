@@ -60,6 +60,10 @@ def main():
     req_type = data.get('type', 'text')
     req_model = data.get('model', 'cbow-glove')
 
+    if len(req_text.strip()) == 0:
+        response = {'status': 1, 'msg': 'Request text is empty.'}
+        return json.dumps(response)
+
     response = {}
     model = None
     if req_model == 'cbow-glove':

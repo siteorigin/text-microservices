@@ -217,12 +217,12 @@ class SkipThoughtsEncoder(object):
       # handle out-of-vocab word
       unk_word = [w for v,w in zip(embeddings, tokenized) if v is None]
       if len(unk_word) > 0 :
-          unk_word_vec = char_w2v.get_vec(unk_word)
-          jdx = 0
-          for idx, vec in enumerate(embeddings):
-              if vec is None:
-                  embeddings[idx] = unk_word_vec[jdx]
-                  jdx += 1
+        unk_word_vec = char_w2v.get_vec(unk_word)
+        jdx = 0
+        for idx, vec in enumerate(embeddings):
+          if vec is None:
+            embeddings[idx] = unk_word_vec[jdx]
+            jdx += 1
 
       preprocessed_data.append(embeddings)
 
