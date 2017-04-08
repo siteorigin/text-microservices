@@ -42,7 +42,6 @@ import tensorflow as tf
 from . import skip_thoughts_model
 from .data import special_words
 
-
 def _pad(seq, target_len):
   """Pads a sequence of word embeddings up to the target length.
 
@@ -194,9 +193,10 @@ class SkipThoughtsEncoder(object):
 
   def _word_to_embedding(self, w):
     """Returns the embedding of a word."""
-    return self._embeddings.get(w, self._embeddings[special_words.UNK])
+    # return self._embeddings.get(w, self._embeddings[special_words.UNK])
+    return self._embeddings.get(w, None)
 
-  def _preprocess(self, data, use_eos):
+  def _preprocess(self, data, use_eos, char_w2v):
     """Preprocesses text for the encoder.
 
     Args:
@@ -212,12 +212,26 @@ class SkipThoughtsEncoder(object):
       tokenized = self._tokenize(item)
       if use_eos:
         tokenized.append(special_words.EOS)
-      preprocessed_data.append([self._word_to_embedding(w) for w in tokenized])
+      embeddings = [self._word_to_embedding(w) for w in tokenized]
+
+      # handle out-of-vocab word
+      unk_word = [w for v,w in zip(embeddings, tokenized) if v is None]
+      if len(unk_word) > 0 :
+          unk_word_vec = char_w2v.get_vec(unk_word)
+          jdx = 0
+          for idx, vec in enumerate(embeddings):
+              if vec is None:
+                  embeddings[idx] = unk_word_vec[jdx]
+                  jdx += 1
+
+      preprocessed_data.append(embeddings)
+
     return preprocessed_data
 
   def encode(self,
              sess,
              data,
+             char_w2v,
              use_norm=True,
              verbose=True,
              batch_size=128,
@@ -237,7 +251,7 @@ class SkipThoughtsEncoder(object):
       thought_vectors: A list of numpy arrays corresponding to the skip-thought
         encodings of sentences in 'data'.
     """
-    data = self._preprocess(data, use_eos)
+    data = self._preprocess(data, use_eos, char_w2v)
     thought_vectors = []
 
     batch_indices = np.arange(0, len(data), batch_size)

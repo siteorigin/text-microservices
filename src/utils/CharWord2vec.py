@@ -3,6 +3,7 @@
 
 import os
 import logging
+import pickle
 import numpy as np
 import char_w2v_model
 import tensorflow as tf
@@ -41,10 +42,16 @@ class CharWord2vec(object):
     """Character-level Word2vec
 
     Arguments:
+        proj: the model path to project output vector to a new vector space
 
     Properties:
+        char_vocab: vocab of characters
+        word_vocab: vocab of output words (Only the size is used to init model)
+        session: the tensorflow session
+        m: the model for char-level word2vec
+        proj: the model for project the char-level word2vec to a new vector space
     """
-    def __init__(self):
+    def __init__(self, proj=None):
         cur_path = os.path.abspath(os.path.dirname(__file__))
         ckp_path = os.path.join(cur_path, "../../models/char_word2vec")
         ckp_file = os.path.join(ckp_path, "epoch024_4.4100.model")
@@ -74,6 +81,13 @@ class CharWord2vec(object):
                     saver = tf.train.Saver()
                     saver.restore(self.session, ckp_file)
                     logger.info('Loaded model from', ckp_file, 'saved at global step', global_step.eval())
+
+        if proj is None:
+            self.proj = proj
+        else:
+            with open(proj) as f:
+                self.proj = pickle.load(f)
+
 
     def get_vec(self, words):
 	"""Get vectors of words in sentence
@@ -105,6 +119,11 @@ class CharWord2vec(object):
                 result = np.concatenate((result, vectors), axis=0)
         # cut off the line we append
         result = result[:word_num, :]
+
+        # project the char-level embedding to specific vector space
+        if self.proj is not None:
+            result = self.proj.predict(result)
+
         return result
 
 if __name__=='__main__':

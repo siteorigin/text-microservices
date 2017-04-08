@@ -96,6 +96,7 @@ class EncoderManager(object):
 
   def encode(self,
              data,
+             char_w2v,
              use_norm=True,
              verbose=False,
              batch_size=128,
@@ -126,6 +127,7 @@ class EncoderManager(object):
               encoder.encode(
                   sess,
                   data,
+                  char_w2v,
                   use_norm=use_norm,
                   verbose=verbose,
                   batch_size=batch_size,
