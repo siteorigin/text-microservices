@@ -107,16 +107,14 @@ class CharWord2vec(object):
                 char_tensors = np.concatenate((char_tensors, char_tensors[:1,:]))
 
         # run batch by batch
-        result = None
+        result = []
         for i in xrange(int(char_tensors.shape[0] / FLAGS.num_unroll_steps)):
             batch = char_tensors[i*FLAGS.num_unroll_steps: (i+1)*FLAGS.num_unroll_steps, :]
             batch = np.expand_dims(batch, axis=0)
             vectors = self.session.run(self.m.input_cnn, {self.m.input: batch})
             vectors = vectors.reshape(vectors.shape[1:])
-            if result is None:
-                result = vectors
-            else:
-                result = np.concatenate((result, vectors), axis=0)
+            result.append(vectors)
+        result = np.concatenate(result, axis=0)
         # cut off the line we append
         result = result[:word_num, :]
 

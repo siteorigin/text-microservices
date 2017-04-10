@@ -25,7 +25,7 @@ class CBOW(Text2vecBase):
         super(CBOW, self).__init__()
 
         cur_path = os.path.abspath(os.path.dirname(__file__))
-        PROJ_MODEL_PATH = os.path.join(cur_path, "../../models/char_word2vec/cbow-glove_linear_projection.m")
+        PROJ_MODEL_PATH = os.path.join(cur_path, "../../models/char_word2vec/cbow_linear_projection.m")
 
         self.w2v = Word2vec(cache_size=1000)
         self.char_w2v = CharWord2vec(proj = PROJ_MODEL_PATH)
