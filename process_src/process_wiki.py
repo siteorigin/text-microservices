@@ -5,6 +5,7 @@ import os
 import sys
 import logging
 import codecs
+from collections import defaultdict
 from nltk import word_tokenize
 from nltk.tokenize import sent_tokenize
 from gensim.corpora.wikicorpus import *
@@ -12,7 +13,7 @@ from gensim.corpora.wikicorpus import *
 def tokenize(content):
     # override original method in wikicorpus.py
     sents = sent_tokenize(content)
-    sents = [word_tokenize(sent.strip().lower()) for sent in sents]
+    sents = [word_tokenize(sent.strip()) for sent in sents]
     return sents
 
 def process_article(args):
@@ -75,26 +76,38 @@ if __name__ == '__main__':
         print 'Usage: python process_wiki.py in_file out_file'
         sys.exit(1)
     inp, outp = sys.argv[1:3]
-    i = 0
 
-    use_vocab = True
-    if use_vocab:
-        with open('../data/vocab.txt') as f:
-            idx2word = [w.strip() for w in f.readlines()]
-        word2idx = dict([(w,idx) for idx,w in enumerate(idx2word)])
-        words = set(idx2word)
-
-    output = codecs.open(outp, 'w', 'utf-8')
+    max_document = 2000
+    n_words = 100000
+    word_cnt = defaultdict(int)
     wiki = MyWikiCorpus(inp, lemmatize=False, dictionary={})
+
+    i = 0
     for text in wiki.get_texts():
-        if use_vocab:
-            sents = [' '.join([w if w in words else '<unk>' for w in sent]) for sent in text]
-        else:
-            sents = [' '.join(sent) for sent in text]
-        output.write('\n'.join(sents) + '\n\n')
+        for sent in text:
+            for w in sent:
+                word_cnt[w] += 1
         i = i + 1
-        if (i % 10000 == 0):
+        if (i % 1000 == 0):
+            logger.info("Processed " + str(i) + " articles")
+        if (i > max_document):
+            break
+    words = [w for w in sorted(word_cnt, key=word_cnt.get, reverse=True)]
+    words = set(words[:n_words])
+
+    i = 0
+    output = codecs.open(outp, 'w', 'utf-8')
+    for text in wiki.get_texts():
+        new_text = []
+        for sent in text:
+            sent = [w if w in words else '<unk>' for w in sent]
+            new_text.append(' '.join(sent))
+        output.write('\n'.join(new_text) + '\n\n')
+        i = i + 1
+        if (i % 1000 == 0):
             logger.info("Saved " + str(i) + " articles")
+        if (i > max_document):
+            break
 
     output.close()
     logger.info("Finished Saved " + str(i) + " articles")
