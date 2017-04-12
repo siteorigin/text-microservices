@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s: %(message)s')
 logging.root.setLevel(level=logging.DEBUG)
 
-# cbow_glove_model = CBOW()
+cbow_glove_model = CBOW()
 skip_thought_model = SkipThought()
 
 def test_cbow():
@@ -43,5 +43,5 @@ def test_skip_thought():
     logger.debug("End testing skip-thought model. \n")
 
 if __name__ == '__main__':
-    # test_cbow()
+    test_cbow()
     test_skip_thought()

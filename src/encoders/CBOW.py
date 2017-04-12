@@ -38,7 +38,7 @@ class CBOW(Text2vecBase):
 	Returns:
 	    300-dims numpy array
       	"""
-        sent = word_tokenize(raw_sent.lower())
+        sent = word_tokenize(raw_sent)
         sent_vec = self.w2v.get_vec(sent)
 
         # sent_vec = [vec for vec in sent_vec if vec is not None]

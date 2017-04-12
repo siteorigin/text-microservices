@@ -32,23 +32,25 @@ class SkipThought(Text2vecBase):
         encoder: the sentence encoder model
         char_w2v: the word2vec model for out-of-vocab words
     """
-    def __init__(self):
+    def __init__(self, use_char2vec=False):
         super(SkipThought, self).__init__()
+        self.use_char2vec = use_char2vec
 
         cur_path = os.path.abspath(os.path.dirname(__file__))
         # Set paths to the model.
         VOCAB_FILE = os.path.join(cur_path, "../../models/skip_thoughts_uni_2017_02_02/vocab.txt")
         EMBEDDING_MATRIX_FILE = os.path.join(cur_path, "../../models/skip_thoughts_uni_2017_02_02/embeddings.npy")
         CHECKPOINT_PATH = os.path.join(cur_path, "../../models/skip_thoughts_uni_2017_02_02/model.ckpt-501424")
-        PROJ_MODEL_PATH = os.path.join(cur_path, "../../models/char_word2vec/skip-thought_linear_projection.m")
 
         self.encoder = encoder_manager.EncoderManager()
         self.encoder.load_model(configuration.model_config(),
                            vocabulary_file=VOCAB_FILE,
                            embedding_matrix_file=EMBEDDING_MATRIX_FILE,
                            checkpoint_path=CHECKPOINT_PATH)
-        self.char_w2v = CharWord2vec(proj = PROJ_MODEL_PATH)
 
+        if self.use_char2vec:
+            PROJ_MODEL_PATH = os.path.join(cur_path, "../../models/char_word2vec/skip-thought_linear_projection.m")
+            self.char_w2v = CharWord2vec(proj = PROJ_MODEL_PATH)
 
 
     def encode_sents(self, sents):
@@ -59,6 +61,9 @@ class SkipThought(Text2vecBase):
 	Returns:
 	    list of 300-dims numpy array
       	"""
-        encodings = self.encoder.encode(sents, self.char_w2v)
+        if self.use_char2vec:
+            encodings = self.encoder.encode(sents, char_w2v=self.char_w2v)
+        else:
+            encodings = self.encoder.encode(sents)
         return encodings
 

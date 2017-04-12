@@ -3,7 +3,6 @@ import pickle
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-'''
 source_vec_file = '../../data/skip-thought_char_embedding.npy'
 vocab_file = '../../models/skip_thoughts_uni_2017_02_02/vocab.txt'
 target_vec_file = '../../models/skip_thoughts_uni_2017_02_02/embeddings.npy'
@@ -13,6 +12,7 @@ source_vec_file = '../../data/cbow_char_embedding.npy'
 vocab_file = '../../models/cbow/glove.840B.300d.vocab.txt'
 target_vec_file = '../../models/cbow/glove.840B.300d.txt'
 save_model_file = '../../models/char_word2vec/cbow_linear_projection.m'
+'''
 
 def vec_sim(v1, v2):
     cos = np.dot(v1, v2) / np.sqrt(np.dot(v1, v1) * np.dot(v2, v2))
@@ -53,12 +53,12 @@ def train(max_num = 1500000):
 def test(test_word):
     with open(vocab_file) as f:
         vocab = f.readlines()
-        vocab = [w.strip().lower() for w in vocab][:10000]
+        vocab = [w.strip().lower() for w in vocab]
     print len(vocab)
     vocab2idx = dict([(w,idx) for idx,w in enumerate(vocab)])
     test_idx = vocab2idx[test_word]
 
-    source_vec = np.load(source_vec_file)[:100000]
+    source_vec = np.load(source_vec_file)
     print source_vec.shape
 
     with open(save_model_file) as f:
@@ -76,4 +76,4 @@ def test(test_word):
 
 if __name__ == '__main__':
     train()
-    test('basketball')
+    test('google')

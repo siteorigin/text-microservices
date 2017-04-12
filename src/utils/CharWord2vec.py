@@ -125,10 +125,23 @@ class CharWord2vec(object):
         return result
 
 if __name__=='__main__':
-    w2v = CharWord2vec()
-
-    words = ['monday', 'friday', 'day', 'test', 'apple']
-    vec = w2v.get_vec(words)
     from helper import vec_sim
-    for w,v in zip(words, vec):
-        print words[0],w,vec_sim(vec[0,:], v)
+    w2v = CharWord2vec('../../models/char_word2vec/skip-thought_linear_projection.m')
+    # w2v = CharWord2vec('../../models/char_word2vec/cbow_linear_projection.m')
+    # w2v = CharWord2vec()
+
+    def test_words(words):
+        vec = w2v.get_vec(words)
+        print(vec.shape)
+        result = []
+        for w,v in zip(words, vec):
+            result.append((words[0],w,vec_sim(vec[0,:], v)))
+        result = sorted(result, key=lambda x: x[2], reverse=True)
+        for x in result:
+            print('%s\t%s\t%f' % x)
+
+    words = ['monday', 'fridays', 'mondays', 'minday', 'day', 'test', 'apple', 'google', 'test']
+    test_words(words)
+
+    words = ['apple', 'fridays', 'mondays', 'minday', 'day', 'test', 'banana', 'orange', 'google', 'apples']
+    test_words(words)

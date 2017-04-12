@@ -95,4 +95,4 @@ def main():
 
 if __name__ == '__main__':
     logger.info("Running %s" % ' '.join(sys.argv))
-    app.run()
+    app.run(host='0.0.0.0')

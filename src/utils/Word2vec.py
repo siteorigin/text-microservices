@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 import logging
 import numpy as np
 from collections import defaultdict
@@ -30,7 +31,8 @@ class Word2vec(object):
         logger.info('loading %s...', vocab_path)
         self.idx2word = []
         with open(vocab_path) as f:
-            self.idx2word = [w.strip().lower().decode('utf-8') for w in f.readlines()]
+            # self.idx2word = [w.strip().lower().decode('utf-8') for w in f.readlines()]
+            self.idx2word = [w.strip().decode('utf-8') for w in f.readlines()]
         self.word2idx = dict([(w,idx)for idx,w in enumerate(self.idx2word)])
         self.words = set(self.idx2word)
         logger.info("Load done. Vocab size: %d", len(self.idx2word))
@@ -55,7 +57,7 @@ class Word2vec(object):
 	"""Get vectors of words in sentence
 
 	Arguments:
-	    sentence: a list of word(lower case)
+	    sentence: a list of word
 	Returns:
 	    2-D array, each line is the vector of the each word, but out-of-vocab word will be None
       	"""
@@ -89,6 +91,7 @@ class Word2vec(object):
                 fp.seek(self.line_offset[line_num])
                 line = fp.readline()
                 vec = np.array([float(num) for num in line.split(' ')[1:]])
+                print line.split(' ')[0]
                 if len(vec) != 300:
                     vec = np.random.rand(300)
                 self.cache[line_num] = vec # put into cache
@@ -101,6 +104,21 @@ class Word2vec(object):
         return result
 
 if __name__=='__main__':
+    from helper import vec_sim
     w2v = Word2vec(cache_size=11)
-    for x in xrange(100):
-        vec = w2v.get_vec([str(num) for num in list(range(x, x+10))])
+
+    test1 = ['man', 'woman']
+    vec = w2v.get_vec(test1)
+    print(test1, vec_sim(vec[0], vec[1]))
+
+    test1 = ['man', 'apple']
+    vec = w2v.get_vec(test1)
+    print(test1, vec_sim(vec[0], vec[1]))
+
+    test1 = ['dog', 'sunny']
+    vec = w2v.get_vec(test1)
+    print(test1, vec_sim(vec[0], vec[1]))
+
+    test1 = ['rain', 'sunny']
+    vec = w2v.get_vec(test1)
+    print(test1, vec_sim(vec[0], vec[1]))

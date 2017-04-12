@@ -196,7 +196,7 @@ class SkipThoughtsEncoder(object):
     # return self._embeddings.get(w, self._embeddings[special_words.UNK])
     return self._embeddings.get(w, None)
 
-  def _preprocess(self, data, use_eos, char_w2v):
+  def _preprocess(self, data, use_eos, char_w2v=None):
     """Preprocesses text for the encoder.
 
     Args:
@@ -217,7 +217,10 @@ class SkipThoughtsEncoder(object):
       # handle out-of-vocab word
       unk_word = [w for v,w in zip(embeddings, tokenized) if v is None]
       if len(unk_word) > 0 :
-        unk_word_vec = char_w2v.get_vec(unk_word)
+        if char_w2v is None:
+          unk_word_vec = self._embeddings[special_words.UNK]*len(unk_word)
+        else:
+          unk_word_vec = char_w2v.get_vec(unk_word)
         jdx = 0
         for idx, vec in enumerate(embeddings):
           if vec is None:
@@ -231,7 +234,7 @@ class SkipThoughtsEncoder(object):
   def encode(self,
              sess,
              data,
-             char_w2v,
+             char_w2v=None,
              use_norm=True,
              verbose=True,
              batch_size=128,
@@ -251,7 +254,7 @@ class SkipThoughtsEncoder(object):
       thought_vectors: A list of numpy arrays corresponding to the skip-thought
         encodings of sentences in 'data'.
     """
-    data = self._preprocess(data, use_eos, char_w2v)
+    data = self._preprocess(data, use_eos, char_w2v=char_w2v)
     thought_vectors = []
 
     batch_indices = np.arange(0, len(data), batch_size)
