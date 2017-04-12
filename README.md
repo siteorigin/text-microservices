@@ -10,6 +10,11 @@ Install python modules and nltk data for tokenizer:
 >>> python -m nltk.downloader 'punkt'
 ```
 
+Model files for character level word embedding `char_word2vec`, 
+```shell
+>>> TODO
+```
+
 Model files for `cbow-glove`, download Glove and preprocessing:
 
 ```shell
