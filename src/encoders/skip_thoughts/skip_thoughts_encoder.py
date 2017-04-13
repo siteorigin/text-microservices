@@ -220,7 +220,8 @@ class SkipThoughtsEncoder(object):
         if char_w2v is None:
           unk_word_vec = self._embeddings[special_words.UNK]*len(unk_word)
         else:
-          unk_word_vec = char_w2v.get_vec(unk_word)
+          unk_word_vec = char_w2v[0].get_vec(unk_word)
+          unk_word_vec = char_w2v[1].predict(unk_word_vec)
         jdx = 0
         for idx, vec in enumerate(embeddings):
           if vec is None:

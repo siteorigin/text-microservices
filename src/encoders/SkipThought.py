@@ -4,6 +4,7 @@
 import os
 import sys
 import dill
+import pickle
 import logging
 import numpy as np
 import tensorflow as tf
@@ -32,7 +33,7 @@ class SkipThought(Text2vecBase):
         encoder: the sentence encoder model
         char_w2v: the word2vec model for out-of-vocab words
     """
-    def __init__(self, use_char2vec=False):
+    def __init__(self, use_char2vec=True):
         super(SkipThought, self).__init__()
         self.use_char2vec = use_char2vec
 
@@ -50,8 +51,9 @@ class SkipThought(Text2vecBase):
 
         if self.use_char2vec:
             PROJ_MODEL_PATH = os.path.join(cur_path, "../../models/char_word2vec/skip-thought_linear_projection.m")
-            self.char_w2v = CharWord2vec(proj = PROJ_MODEL_PATH)
-
+            self.char_w2v = CharWord2vec()
+            with open(PROJ_MODEL_PATH) as f:
+                self.proj = pickle.load(f)
 
     def encode_sents(self, sents):
 	"""Encode many sentence to vectors
@@ -62,7 +64,7 @@ class SkipThought(Text2vecBase):
 	    list of 300-dims numpy array
       	"""
         if self.use_char2vec:
-            encodings = self.encoder.encode(sents, char_w2v=self.char_w2v)
+            encodings = self.encoder.encode(sents, char_w2v=(self.char_w2v, self.proj))
         else:
             encodings = self.encoder.encode(sents)
         return encodings

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import inspect
 import logging
 import pickle
 import numpy as np
@@ -38,6 +39,29 @@ flags.DEFINE_string ('EOS',            '+',  '<EOS> symbol. should be a single u
 
 FLAGS = flags.FLAGS
 
+'''
+Python singleton with parameters (so the same parameters get you the same object)
+with support to default arguments and passing arguments as kwargs (but no support for pure kwargs).
+'''
+class Singleton(type):
+    _instances = {}
+    _init = {}
+
+    def __init__(cls, name, bases, dct):
+        cls._init[cls] = dct.get('__init__', None)
+
+    def __call__(cls, *args, **kwargs):
+        init = cls._init[cls]
+        if init is not None:
+            key = (cls, frozenset(
+                    inspect.getcallargs(init, None, *args, **kwargs).items()))
+        else:
+            key = cls
+
+        if key not in cls._instances:
+            cls._instances[key] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[key]
+
 class CharWord2vec(object):
     """Character-level Word2vec
 
@@ -51,7 +75,8 @@ class CharWord2vec(object):
         m: the model for char-level word2vec
         proj: the model for project the char-level word2vec to a new vector space
     """
-    def __init__(self, proj=None):
+    __metaclass__ = Singleton
+    def __init__(self):
         cur_path = os.path.abspath(os.path.dirname(__file__))
         ckp_path = os.path.join(cur_path, "../../models/char_word2vec")
         ckp_file = os.path.join(ckp_path, "epoch024_4.4100.model")
@@ -81,12 +106,6 @@ class CharWord2vec(object):
                     saver.restore(self.session, ckp_file)
 
                     logger.info('Loaded model from %s', ckp_file)
-
-        if proj is None:
-            self.proj = proj
-        else:
-            with open(proj) as f:
-                self.proj = pickle.load(f)
 
 
     def get_vec(self, words):
@@ -118,17 +137,11 @@ class CharWord2vec(object):
         # cut off the line we append
         result = result[:word_num, :]
 
-        # project the char-level embedding to specific vector space
-        if self.proj is not None:
-            result = self.proj.predict(result)
-
         return result
 
 if __name__=='__main__':
     from helper import vec_sim
-    w2v = CharWord2vec('../../models/char_word2vec/skip-thought_linear_projection.m')
-    # w2v = CharWord2vec('../../models/char_word2vec/cbow_linear_projection.m')
-    # w2v = CharWord2vec()
+    w2v = CharWord2vec()
 
     def test_words(words):
         vec = w2v.get_vec(words)

@@ -3,6 +3,7 @@
 
 import os
 import sys
+import pickle
 import logging
 import numpy as np
 from nltk import word_tokenize
@@ -28,7 +29,9 @@ class CBOW(Text2vecBase):
         PROJ_MODEL_PATH = os.path.join(cur_path, "../../models/char_word2vec/cbow_linear_projection.m")
 
         self.w2v = Word2vec(cache_size=1000)
-        self.char_w2v = CharWord2vec(proj = PROJ_MODEL_PATH)
+        self.char_w2v = CharWord2vec()
+        with open(PROJ_MODEL_PATH) as f:
+            self.proj = pickle.load(f)
 
     def encode_sent(self, raw_sent):
 	"""Encode a sentence to vector
@@ -46,6 +49,9 @@ class CBOW(Text2vecBase):
         unk_word = [w for v,w in zip(sent_vec, sent) if v is None]
         if len(unk_word) > 0 :
             unk_word_vec = self.char_w2v.get_vec(unk_word)
+            # project the char-level embedding to specific vector space
+            unk_word_vec = self.proj.predict(unk_word_vec)
+
             jdx = 0
             for idx, vec in enumerate(sent_vec):
                 if vec is None:
