@@ -40,7 +40,7 @@ class SkipThought(Text2vecBase):
         cur_path = os.path.abspath(os.path.dirname(__file__))
         # Set paths to the model.
         VOCAB_FILE = os.path.join(cur_path, "../../models/skip_thoughts_uni_2017_02_02/vocab.txt")
-        EMBEDDING_MATRIX_FILE = os.path.join(cur_path, "../../models/skip_thoughts_uni_2017_02_02/embeddings.npy")
+        EMBEDDING_MATRIX_FILE = os.path.join(cur_path, "../../models/skip_thoughts_uni_2017_02_02/embeddings.txt")
         CHECKPOINT_PATH = os.path.join(cur_path, "../../models/skip_thoughts_uni_2017_02_02/model.ckpt-501424")
 
         self.encoder = encoder_manager.EncoderManager()

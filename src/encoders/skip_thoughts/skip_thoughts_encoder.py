@@ -194,7 +194,8 @@ class SkipThoughtsEncoder(object):
   def _word_to_embedding(self, w):
     """Returns the embedding of a word."""
     # return self._embeddings.get(w, self._embeddings[special_words.UNK])
-    return self._embeddings.get(w, None)
+    # return self._embeddings.get(w, None)
+    return self._embeddings.get_vec([w])[0]
 
   def _preprocess(self, data, use_eos, char_w2v=None):
     """Preprocesses text for the encoder.

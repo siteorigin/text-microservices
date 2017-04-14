@@ -106,6 +106,7 @@ class CharWord2vec(object):
                     saver.restore(self.session, ckp_file)
 
                     logger.info('Loaded model from %s', ckp_file)
+        del self.word_vocab
 
 
     def get_vec(self, words):

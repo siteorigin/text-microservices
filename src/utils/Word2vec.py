@@ -23,21 +23,29 @@ class Word2vec(object):
         vec_path: the path of vector file
         cache: a fifo cache for vectors
     """
-    def __init__(self, cache_size=1000):
+    def __init__(self, cache_size=1000, vocab_path=None, vec_path=None, check_len=300):
         cur_path = os.path.abspath(os.path.dirname(__file__))
 
+        if vocab_path is None:
+            self.vocab_path = os.path.join(cur_path, "../../models/cbow/glove.840B.300d.vocab.txt")
+        else:
+            self.vocab_path = vocab_path
+        if vec_path is None:
+            self.vec_path = os.path.join(cur_path, "../../models/cbow/glove.840B.300d.txt")
+        else:
+            self.vec_path = vec_path
+        self.check_len = check_len
+
         # load vocab into memory
-        vocab_path = os.path.join(cur_path, "../../models/cbow/glove.840B.300d.vocab.txt")
-        logger.info('loading %s...', vocab_path)
+        logger.info('loading %s...', self.vocab_path)
         self.idx2word = []
-        with open(vocab_path) as f:
+        with open(self.vocab_path) as f:
             # self.idx2word = [w.strip().lower().decode('utf-8') for w in f.readlines()]
             self.idx2word = [w.strip().decode('utf-8') for w in f.readlines()]
         self.word2idx = dict([(w,idx)for idx,w in enumerate(self.idx2word)])
         self.words = set(self.idx2word)
         logger.info("Load done. Vocab size: %d", len(self.idx2word))
 
-        self.vec_path = os.path.join(cur_path, "../../models/cbow/glove.840B.300d.txt")
         # cache the offset of each line
 	# Read in the file once and build a list of line offsets
         self.line_offset = []
@@ -61,7 +69,6 @@ class Word2vec(object):
 	Returns:
 	    2-D array, each line is the vector of the each word, but out-of-vocab word will be None
       	"""
-
         result = [None] * len(sent)
 
         # return a random vector if not found, otherwise convert to idx
@@ -91,9 +98,8 @@ class Word2vec(object):
                 fp.seek(self.line_offset[line_num])
                 line = fp.readline()
                 vec = np.array([float(num) for num in line.split(' ')[1:]])
-                print line.split(' ')[0]
-                if len(vec) != 300:
-                    vec = np.random.rand(300)
+                if len(vec) != self.check_len:
+                    vec = np.random.rand(self.check_len)
                 self.cache[line_num] = vec # put into cache
                 for idx in w_not_hit[line_num]: # put into result
                     result[idx] = vec

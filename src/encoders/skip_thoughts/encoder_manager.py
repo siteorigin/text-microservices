@@ -38,7 +38,7 @@ import tensorflow as tf
 
 # from skip_thoughts import skip_thoughts_encoder
 from . import skip_thoughts_encoder
-
+from utils import Word2vec
 
 class EncoderManager(object):
   """Manager class for loading and encoding with skip-thoughts models."""
@@ -61,6 +61,7 @@ class EncoderManager(object):
       checkpoint_path: SkipThoughtsModel checkpoint file or a directory
         containing a checkpoint file.
     """
+    '''
     tf.logging.info("Reading vocabulary from %s", vocabulary_file)
     with tf.gfile.GFile(vocabulary_file, mode="r") as f:
       lines = list(f.readlines())
@@ -77,6 +78,8 @@ class EncoderManager(object):
 
     word_embeddings = collections.OrderedDict(
         zip(reverse_vocab, embedding_matrix))
+    '''
+    word_embeddings = Word2vec(cache_size=1000, vocab_path=vocabulary_file, vec_path=embedding_matrix_file, check_len=620)
 
     g = tf.Graph()
     with g.as_default():
