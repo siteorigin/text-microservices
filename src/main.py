@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s: %(message)s')
 logging.root.setLevel(level=logging.INFO)
 
-cbow_glove_model = CBOW()
+cbow_glove_model = CBOW(use_char=True)
 skip_thought_model = SkipThought()
 
 @app.route("/_ah/health")

@@ -119,7 +119,8 @@ def inference_graph(char_vocab_size, word_vocab_size,
                     kernels         = [ 1,   2,   3,   4,   5,   6,   7],
                     kernel_features = [50, 100, 150, 200, 200, 200, 200],
                     num_unroll_steps=35,
-                    dropout=0.0):
+                    dropout=0.0,
+                    cnn_only=False):
 
     assert len(kernels) == len(kernel_features), 'Kernel and Features must have the same size'
 
@@ -149,43 +150,51 @@ def inference_graph(char_vocab_size, word_vocab_size,
     if num_highway_layers > 0:
         input_cnn = highway(input_cnn, input_cnn.get_shape()[-1], num_layers=num_highway_layers)
 
-    ''' Finally, do LSTM '''
-    with tf.variable_scope('LSTM'):
-        # cell = tf.nn.rnn_cell.BasicLSTMCell(rnn_size, state_is_tuple=True, forget_bias=0.0)
-        cell = tf.contrib.rnn.BasicLSTMCell(rnn_size, state_is_tuple=True, forget_bias=0.0)
-        if dropout > 0.0:
-            # cell = tf.nn.rnn_cell.DropoutWrapper(cell, output_keep_prob=1.-dropout)
-            cell = tf.contrib.rnn.DropoutWrapper(cell, output_keep_prob=1.-dropout)
-        if num_rnn_layers > 1:
-            cell = tf.contrib.rnn.MultiRNNCell([cell] * num_rnn_layers, state_is_tuple=True)
+    # reshape for LSTM
+    input_cnn = tf.reshape(input_cnn, [batch_size, num_unroll_steps, -1])
+    if not cnn_only:
+        ''' Finally, do LSTM '''
+        with tf.variable_scope('LSTM'):
+            # cell = tf.nn.rnn_cell.BasicLSTMCell(rnn_size, state_is_tuple=True, forget_bias=0.0)
+            cell = tf.contrib.rnn.BasicLSTMCell(rnn_size, state_is_tuple=True, forget_bias=0.0)
+            if dropout > 0.0:
+                # cell = tf.nn.rnn_cell.DropoutWrapper(cell, output_keep_prob=1.-dropout)
+                cell = tf.contrib.rnn.DropoutWrapper(cell, output_keep_prob=1.-dropout)
+            if num_rnn_layers > 1:
+                cell = tf.contrib.rnn.MultiRNNCell([cell] * num_rnn_layers, state_is_tuple=True)
 
-        initial_rnn_state = cell.zero_state(batch_size, dtype=tf.float32)
+            initial_rnn_state = cell.zero_state(batch_size, dtype=tf.float32)
 
-        input_cnn = tf.reshape(input_cnn, [batch_size, num_unroll_steps, -1])
-        # input_cnn2 = [tf.squeeze(x, [1]) for x in tf.split(1, num_unroll_steps, input_cnn)]
-        input_cnn2 = [tf.squeeze(x, [1]) for x in tf.split(input_cnn, num_unroll_steps, axis=1)]
+            input_cnn2 = [tf.squeeze(x, [1]) for x in tf.split(input_cnn, num_unroll_steps, axis=1)]
+            # outputs, final_rnn_state = tf.nn.rnn(cell, input_cnn2, initial_state=initial_rnn_state, dtype=tf.float32)
+            outputs, final_rnn_state = tf.contrib.rnn.static_rnn(cell, input_cnn2, initial_state=initial_rnn_state, dtype=tf.float32)
 
-        # outputs, final_rnn_state = tf.nn.rnn(cell, input_cnn2, initial_state=initial_rnn_state, dtype=tf.float32)
-        outputs, final_rnn_state = tf.contrib.rnn.static_rnn(cell, input_cnn2, initial_state=initial_rnn_state, dtype=tf.float32)
+            # linear projection onto output (word) vocab
+            logits = []
+            with tf.variable_scope('WordEmbedding') as scope:
+                for idx, output in enumerate(outputs):
+                    if idx > 0:
+                        scope.reuse_variables()
+                    logits.append(linear(output, word_vocab_size))
 
-        # linear projection onto output (word) vocab
-        logits = []
-        with tf.variable_scope('WordEmbedding') as scope:
-            for idx, output in enumerate(outputs):
-                if idx > 0:
-                    scope.reuse_variables()
-                logits.append(linear(output, word_vocab_size))
-
-    return adict(
-        input = input_,
-        clear_char_embedding_padding=clear_char_embedding_padding,
-        input_embedded=input_embedded,
-        input_cnn=input_cnn,
-        initial_rnn_state=initial_rnn_state,
-        final_rnn_state=final_rnn_state,
-        rnn_outputs=outputs,
-        logits = logits
-    )
+    if not cnn_only:
+        return adict(
+            input = input_,
+            clear_char_embedding_padding=clear_char_embedding_padding,
+            input_embedded=input_embedded,
+            input_cnn=input_cnn,
+            initial_rnn_state=initial_rnn_state,
+            final_rnn_state=final_rnn_state,
+            rnn_outputs=outputs,
+            logits = logits
+        )
+    else:
+        return adict(
+            input = input_,
+            clear_char_embedding_padding=clear_char_embedding_padding,
+            input_embedded=input_embedded,
+            input_cnn=input_cnn
+        )
 
 
 def loss_graph(logits, batch_size, num_unroll_steps):

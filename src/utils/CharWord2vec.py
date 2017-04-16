@@ -54,7 +54,7 @@ class Singleton(type):
         init = cls._init[cls]
         if init is not None:
             key = (cls, frozenset(
-                    inspect.getcallargs(init, None, *args, **kwargs).items()))
+                inspect.getcallargs(init, None, *args, **kwargs).items()))
         else:
             key = cls
 
@@ -70,7 +70,6 @@ class CharWord2vec(object):
 
     Properties:
         char_vocab: vocab of characters
-        word_vocab: vocab of output words (Only the size is used to init model)
         session: the tensorflow session
         m: the model for char-level word2vec
         proj: the model for project the char-level word2vec to a new vector space
@@ -81,16 +80,17 @@ class CharWord2vec(object):
         ckp_path = os.path.join(cur_path, "../../models/char_word2vec")
         ckp_file = os.path.join(ckp_path, "epoch024_4.4100.model")
         self.char_vocab =  Vocab.load(os.path.join(ckp_path, 'char_vocab.pkl'))
-        self.word_vocab =  Vocab.load(os.path.join(ckp_path, 'word_vocab.pkl'))
+        word_vocab =  Vocab.load(os.path.join(ckp_path, 'word_vocab.pkl'))
 
-        with tf.Graph().as_default():
+        graph = tf.Graph()
+        with graph.as_default():
             self.session = tf.Session()
             with self.session.as_default():
                 ''' build inference graph '''
                 with tf.variable_scope("Model"):
                     self.m = char_w2v_model.inference_graph(
                             char_vocab_size=self.char_vocab.size,
-                            word_vocab_size=self.word_vocab.size,
+                            word_vocab_size=word_vocab.size,
                             char_embed_size=FLAGS.char_embed_size,
                             batch_size=FLAGS.batch_size,
                             num_highway_layers=FLAGS.highway_layers,
@@ -100,13 +100,14 @@ class CharWord2vec(object):
                             kernels=eval(FLAGS.kernels),
                             kernel_features=eval(FLAGS.kernel_features),
                             num_unroll_steps=FLAGS.num_unroll_steps,
-                            dropout=0)
+                            dropout=0, cnn_only=True)
 
                     saver = tf.train.Saver()
                     saver.restore(self.session, ckp_file)
 
+                    # TODO: maybe extract a subgraph but not using cnn_only=True
+
                     logger.info('Loaded model from %s', ckp_file)
-        del self.word_vocab
 
 
     def get_vec(self, words):
