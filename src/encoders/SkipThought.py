@@ -33,9 +33,9 @@ class SkipThought(Text2vecBase):
         encoder: the sentence encoder model
         char_w2v: the word2vec model for out-of-vocab words
     """
-    def __init__(self, use_char2vec=True):
+    def __init__(self, use_char=False):
         super(SkipThought, self).__init__()
-        self.use_char2vec = use_char2vec
+        self.use_char2vec = use_char
 
         cur_path = os.path.abspath(os.path.dirname(__file__))
         # Set paths to the model.
