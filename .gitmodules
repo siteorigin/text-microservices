@@ -4,3 +4,6 @@
 [submodule "train_src/lstm-char-cnn-tensorflow"]
 	path = train_src/lstm-char-cnn-tensorflow
 	url = https://github.com/zhangzibin/lstm-char-cnn-tensorflow.git
+[submodule "train_src/tf-lstm-char-cnn"]
+	path = train_src/tf-lstm-char-cnn
+	url = https://github.com/zhangzibin/tf-lstm-char-cnn.git
