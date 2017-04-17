@@ -12,7 +12,7 @@ Install python modules and nltk data for tokenizer:
 
 Model files for character level word embedding `char_word2vec`, 
 ```shell
->>> TODO
+>>> Put trained model files in /models/char_word2vec/
 ```
 
 Model files for `cbow-glove`, download Glove and preprocessing:
@@ -32,6 +32,7 @@ Model files for `skip-thought`:
 >>> cd ./models
 >>> tar -xvf skip_thoughts_uni_2017_02_02.tar.gz
 >>> rm skip_thoughts_uni_2017_02_02.tar.gz
+>>> python process_src/process_skip-thought.py 
 ```
 
 
