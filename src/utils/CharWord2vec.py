@@ -156,5 +156,6 @@ if __name__=='__main__':
                 print('%s\t%s\t%f' % x)
             print('-------')
 
-    words = ['google', 'microsoft', 'facebook', 'apple', 'amazon', 'gooogle', 'micro', 'faoebook', 'banana', 'sunday', 'monday', 'sundays', 'week']
+    words = ['google', 'microsoft', 'facebook', 'apple', 'amazon', 'gooogle', 'micro', \
+            'faoebook', 'banana', 'sunday', 'monday', 'sundays', 'week', 'computer', 'pc', 'pcs']
     test_words(words)
