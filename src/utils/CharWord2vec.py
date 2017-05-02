@@ -22,7 +22,7 @@ flags.DEFINE_string('load_model',   None,    '(optional) filename of the model t
 # model params
 flags.DEFINE_integer('rnn_size',        650,                            'size of LSTM internal state')
 flags.DEFINE_integer('highway_layers',  2,                              'number of highway layers')
-flags.DEFINE_integer('char_embed_size', 15,                             'dimensionality of character embeddings')
+flags.DEFINE_integer('char_embed_size', 30,                             'dimensionality of character embeddings')
 flags.DEFINE_string ('kernels',         '[1,2,3,4,5,6,7]',              'CNN kernel widths')
 flags.DEFINE_string ('kernel_features', '[50,100,150,200,200,200,200]', 'number of features in the CNN kernel')
 flags.DEFINE_integer('rnn_layers',      2,                              'number of layers in the LSTM')
@@ -78,7 +78,7 @@ class CharWord2vec(object):
     def __init__(self):
         cur_path = os.path.abspath(os.path.dirname(__file__))
         ckp_path = os.path.join(cur_path, "../../models/char_word2vec")
-        ckp_file = os.path.join(ckp_path, "epoch024_4.4100.model")
+        ckp_file = os.path.join(ckp_path, tf.train.latest_checkpoint(ckp_path))
         self.char_vocab =  Vocab.load(os.path.join(ckp_path, 'char_vocab.pkl'))
         word_vocab =  Vocab.load(os.path.join(ckp_path, 'word_vocab.pkl'))
 
@@ -147,16 +147,14 @@ if __name__=='__main__':
 
     def test_words(words):
         vec = w2v.get_vec(words)
-        print(vec.shape)
-        result = []
-        for w,v in zip(words, vec):
-            result.append((words[0],w,vec_sim(vec[0,:], v)))
-        result = sorted(result, key=lambda x: x[2], reverse=True)
-        for x in result:
-            print('%s\t%s\t%f' % x)
+        for K in range(len(words)):
+            result = []
+            for w,v in zip(words, vec):
+                result.append((words[K],w,vec_sim(vec[K,:], v)))
+            result = sorted(result, key=lambda x: x[2], reverse=True)
+            for x in result:
+                print('%s\t%s\t%f' % x)
+            print('-------')
 
-    words = ['monday', 'fridays', 'mondays', 'minday', 'day', 'test', 'apple', 'google', 'test']
-    test_words(words)
-
-    words = ['apple', 'fridays', 'mondays', 'minday', 'day', 'test', 'banana', 'orange', 'google', 'apples']
+    words = ['google', 'microsoft', 'facebook', 'apple', 'amazon', 'gooogle', 'micro', 'faoebook', 'banana', 'sunday', 'monday', 'sundays', 'week']
     test_words(words)
