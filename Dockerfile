@@ -7,17 +7,14 @@ COPY . .
 RUN pip install -r ./requirements.txt && \
 	python -m nltk.downloader 'punkt'
 
-
-RUN apt-get update && \
-	apt-get -f install && \
-	apt-get install wget
-
 # Create all the folders and download the models
 RUN mkdir -p ./models/ && \
-	mkdir -p ./models/cbow && \
-	wget –quiet https://storage.googleapis.com/text-microservice-models/char_word2vec.tar.gz -P ./models && \
-	wget –quiet https://storage.googleapis.com/text-microservice-models/glove.840B.300d.zip -P ./models/cbow/ && \
-	wget –quiet https://storage.googleapis.com/text-microservice-models/skip_thoughts_uni_2017_02_02.tar.gz -P ./models
+	mkdir -p ./models/cbow
+
+# We need all the remotely stored models
+ADD https://storage.googleapis.com/text-microservice-models/char_word2vec.tar.gz ./models/char_word2vec.tar.gz
+ADD https://storage.googleapis.com/text-microservice-models/glove.840B.300d.zip ./models/cbow/glove.840B.300d.zip
+ADD https://storage.googleapis.com/text-microservice-models/skip_thoughts_uni_2017_02_02.tar.gz ./models/skip_thoughts_uni_2017_02_02.tar.gz
 
 # Setup the character word2vec model
 RUN tar -xvf ./models/char_word2vec.tar.gz -C ./models/ && \
