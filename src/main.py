@@ -48,9 +48,9 @@ def auth():
 
 @app.route("/", methods=['GET', 'POST'])
 def main():
-    if os.environ.has_key('SONAR_AUTH_REQUESTS') and not auth():
-        response = {'status': -1, 'msg': 'Login fail.'}
-        return json.dumps(response)
+    # if os.environ.has_key('SONAR_AUTH_REQUESTS') and not auth():
+    #     response = {'status': -1, 'msg': 'Login fail.'}
+    #     return json.dumps(response)
 
     if request.method == 'POST':
         data = request.get_json()
