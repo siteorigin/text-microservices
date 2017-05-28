@@ -12,18 +12,14 @@ Install python modules and nltk data for tokenizer:
 
 Model files for character level word embedding `char_word2vec`, 
 ```shell
->>> mkdir -p ./models/char_word2vec/
->>> wget https://storage.googleapis.com/text-microservice-models/char_word2vec.tar.gz -P ./models
->>> cd ./models
->>> tar -xvf char_word2vec.tar.gz
->>> rm char_word2vec.tar.gz
+>>> Put trained model files, vector transformation files for cbow and skip-thought in /models/char_word2vec/
 ```
 
 Model files for `cbow-glove`, download Glove and preprocessing:
 
 ```shell
 >>> mkdir -p ./models/cbow/
->>> wget https://storage.googleapis.com/text-microservice-models/glove.840B.300d.zip -P ./models/cbow/
+>>> wget http://nlp.stanford.edu/data/glove.840B.300d.zip -P ./models/cbow/
 >>> cd ./models/cbow/
 >>> unzip glove.840B.300d.zip
 >>> rm glove.840B.300d.zip
@@ -32,7 +28,7 @@ Model files for `cbow-glove`, download Glove and preprocessing:
 
 Model files for `skip-thought`:
 ```shell
->>> wget https://storage.googleapis.com/text-microservice-models/skip_thoughts_uni_2017_02_02.tar.gz -P ./models
+>>> wget "http://download.tensorflow.org/models/skip_thoughts_uni_2017_02_02.tar.gz" -P ./models
 >>> cd ./models
 >>> tar -xvf skip_thoughts_uni_2017_02_02.tar.gz
 >>> rm skip_thoughts_uni_2017_02_02.tar.gz
