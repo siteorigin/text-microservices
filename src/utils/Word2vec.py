@@ -26,8 +26,9 @@ class Word2vec(object):
         vec_path: the path of vector file
         cache: a fifo cache for vectors
         line_offset: index for each line of vector, for fast reading from file
+        skip_first_col: whether skip first column of vector file
     """
-    def __init__(self, cache_size=1000, vocab_path=None, vec_path=None, check_len=300, most_words=1000000):
+    def __init__(self, cache_size=1000, vocab_path=None, vec_path=None, check_len=300, most_words=1000000, skip_first_col=True):
         cur_path = os.path.abspath(os.path.dirname(__file__))
 
         if vocab_path is None:
@@ -39,6 +40,7 @@ class Word2vec(object):
         else:
             self.vec_path = vec_path
         self.check_len = check_len
+        self.skip_first_col = skip_first_col
 
         # load vocab into memory
         logger.info('loading %s...', self.vocab_path)
@@ -100,7 +102,10 @@ class Word2vec(object):
             for line_num in w_not_hit.keys():
                 fp.seek(self.line_offset[line_num])
                 line = fp.readline()
-                vec = np.array([round(float(num), 4) for num in line.split(' ')[1:]])
+                if self.skip_first_col:
+                    vec = np.array([round(float(num), 4) for num in line.split(' ')[1:]])
+                else:
+                    vec = np.array([round(float(num), 4) for num in line.split(' ')])
                 if len(vec) != self.check_len:
                     vec = np.random.rand(self.check_len)
                 self.cache[line_num] = vec # put into cache
