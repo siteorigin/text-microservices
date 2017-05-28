@@ -7,28 +7,11 @@ COPY . .
 RUN pip install -r ./requirements.txt && \
 	python -m nltk.downloader 'punkt'
 
-# Create all the folders and download the models
-RUN mkdir -p ./models/ && \
-	mkdir -p ./models/cbow
+ADD https://storage.googleapis.com/text-microservice-models/text-microservice-models.tar.gz ./text-microservice-models.tar.gz
 
-# We need all the remotely stored models
-ADD https://storage.googleapis.com/text-microservice-models/char_word2vec.tar.gz ./models/char_word2vec.tar.gz
-ADD https://storage.googleapis.com/text-microservice-models/glove.840B.300d.zip ./models/cbow/glove.840B.300d.zip
-ADD https://storage.googleapis.com/text-microservice-models/skip_thoughts_uni_2017_02_02.tar.gz ./models/skip_thoughts_uni_2017_02_02.tar.gz
-
-# Setup the character word2vec model
-RUN tar -xvf ./models/char_word2vec.tar.gz -C ./models/ && \
-	rm ./models/char_word2vec.tar.gz
-	
-# Setup the CBOW model
-RUN unzip ./models/cbow/glove.840B.300d.zip -d ./models/cbow/ && \
-	awk '{print $1}' ./models/cbow/glove.840B.300d.txt > ./models/cbow/glove.840B.300d.vocab.txt && \
-	rm ./models/cbow/glove.840B.300d.zip
-
-# Setup the skip thought model
-RUN tar -xvf ./models/skip_thoughts_uni_2017_02_02.tar.gz -C ./models/ && \
-	python ./process_src/process_skip-thought.py && \
-	rm ./models/skip_thoughts_uni_2017_02_02.tar.gz
+# Extract the models
+RUN tar -xvf ./text-microservice-models.tar.gz && \
+	rm ./text-microservice-models.tar.gz
 
 # Run the Gunicorn App
 ENTRYPOINT gunicorn -b :8080 --chdir ./src main:app
