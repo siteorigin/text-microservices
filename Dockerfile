@@ -15,9 +15,9 @@ RUN apt-get update && \
 # Create all the folders and download the models
 RUN mkdir -p ./models/ && \
 	mkdir -p ./models/cbow && \
-	wget –quiet https://storage.googleapis.com/text-microservice-models/char_word2vec.tar.gz -P ./models && \
-	wget –quiet https://storage.googleapis.com/text-microservice-models/glove.840B.300d.zip -P ./models/cbow/ && \
-	wget –quiet https://storage.googleapis.com/text-microservice-models/skip_thoughts_uni_2017_02_02.tar.gz -P ./models
+	wget --quiet https://storage.googleapis.com/text-microservice-models/char_word2vec.tar.gz -P ./models && \
+	wget --quiet https://storage.googleapis.com/text-microservice-models/glove.840B.300d.zip -P ./models/cbow/ && \
+	wget --quiet https://storage.googleapis.com/text-microservice-models/skip_thoughts_uni_2017_02_02.tar.gz -P ./models
 
 # Setup the character word2vec model
 RUN tar -xvf ./models/char_word2vec.tar.gz -C ./models/ && \
