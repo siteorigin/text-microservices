@@ -79,7 +79,7 @@ class EncoderManager(object):
     word_embeddings = collections.OrderedDict(
         zip(reverse_vocab, embedding_matrix))
     '''
-    word_embeddings = Word2vec(cache_size=1000, vocab_path=vocabulary_file, vec_path=embedding_matrix_file, check_len=620)
+    word_embeddings = Word2vec(cache_size=1000, vocab_path=vocabulary_file, vec_path=embedding_matrix_file, check_len=620, skip_first_col=False)
 
     g = tf.Graph()
     with g.as_default():
