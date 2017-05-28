@@ -2,7 +2,7 @@
 import os
 import numpy as np
 
-model_path = '../models/skip_thoughts_uni_2017_02_02'
+model_path = './models/skip_thoughts_uni_2017_02_02'
 
 m = np.load(os.path.join(model_path, 'embeddings.npy'))
 np.savetxt(os.path.join(model_path, 'embeddings.txt'), m, delimiter=' ', fmt='%0.3f')
