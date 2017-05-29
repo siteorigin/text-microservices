@@ -65,8 +65,13 @@ def main():
     req_type = data.get('type')
     req_model = data.get('model')
 
-    if len(req_text.strip()) == 0:
+    # check request text length
+    text_len = len(req_text.strip())
+    if text_len == 0:
         response = {'status': 1, 'msg': 'Request text is empty.'}
+        return json.dumps(response)
+    if text_len > 10000:
+        response = {'status': 1, 'msg': 'Request text is too long (limit in 10,000 characters).'}
         return json.dumps(response)
 
     response = {}
