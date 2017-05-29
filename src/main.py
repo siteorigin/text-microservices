@@ -101,7 +101,7 @@ def main():
                     tmp_res['features'] = [float(x) for x in sent_vec]
                     tmp_res['salience'] = sent_sim
                 response['sentences'].append(tmp_res)
-    return json.dumps(response)
+    return Response(json.dumps(response), mimetype='application/json');
 
 if __name__ == '__main__':
     logger.info("Running %s" % ' '.join(sys.argv))
