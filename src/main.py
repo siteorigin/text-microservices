@@ -30,7 +30,7 @@ def check():
 def auth():
     AUTH_SALT = 'aaabbbccc';
     if request.method == 'POST':
-        data = request.get_json()
+        data = request.headers
     else:
         data = request.args
     if data.has_key('user_email') and data.has_key('key_expire') and data.has_key('key'):
@@ -53,15 +53,25 @@ def main():
     #     return json.dumps(response)
 
     if request.method == 'POST':
-        data = request.get_json()
+        data = request.headers
     else:
         data = request.args
-    req_text = data.get('text', '')
-    req_type = data.get('type', 'text')
-    req_model = data.get('model', 'cbow-glove')
 
-    if len(req_text.strip()) == 0:
+    if not (data.has_key('text') and data.has_key('type') and data.has_key('model')):
+        response = {'status': 1, 'msg': 'Miss request parameters.'}
+        return json.dumps(response)
+
+    req_text = data.get('text')
+    req_type = data.get('type')
+    req_model = data.get('model')
+
+    # check request text length
+    text_len = len(req_text.strip())
+    if text_len == 0:
         response = {'status': 1, 'msg': 'Request text is empty.'}
+        return json.dumps(response)
+    if text_len > 10000:
+        response = {'status': 1, 'msg': 'Request text is too long (limit in 10,000 characters).'}
         return json.dumps(response)
 
     response = {}
