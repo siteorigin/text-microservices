@@ -72,7 +72,7 @@ def main():
     model = None
     if req_model == 'cbow-glove':
         model = cbow_glove_model
-    if req_model == 'skip-thought':
+    else if req_model == 'skip-thought':
         model = skip_thought_model
     else:
         return jsonify({'status': 1, 'msg': 'Model not found.'});
