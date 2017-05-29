@@ -6,62 +6,27 @@
 Install python modules and nltk data for tokenizer:
 
 ```shell
->>> pip install -r requirements.txt
->>> python -m nltk.downloader 'punkt'
+pip install -r requirements.txt
+python -m nltk.downloader 'punkt'
+./text-microservices/install_models.sh
+sudo apt install gunicorn
 ```
 
-Model files for character level word embedding `char_word2vec`, 
-```shell
->>> mkdir -p ./models/char_word2vec/
->>> wget https://storage.googleapis.com/text-microservice-models/char_word2vec.tar.gz -P ./models
->>> cd ./models
->>> tar -xvf char_word2vec.tar.gz
->>> rm char_word2vec.tar.gz
-```
-
-Model files for `cbow-glove`, download Glove and preprocessing:
+Startup script
 
 ```shell
->>> mkdir -p ./models/cbow/
->>> wget https://storage.googleapis.com/text-microservice-models/glove.840B.300d.zip -P ./models/cbow/
->>> cd ./models/cbow/
->>> unzip glove.840B.300d.zip
->>> rm glove.840B.300d.zip
->>> awk '{print $1}' glove.840B.300d.txt > glove.840B.300d.vocab.txt
+pip install -r /path/to/text-microservices/requirements.txt
+python -m nltk.downloader 'punkt'
+sudo -b gunicorn -b :80 --chdir /path/to/text-microservices/src main:app
 ```
 
-Model files for `skip-thought`:
-```shell
->>> wget https://storage.googleapis.com/text-microservice-models/skip_thoughts_uni_2017_02_02.tar.gz -P ./models
->>> cd ./models
->>> tar -xvf skip_thoughts_uni_2017_02_02.tar.gz
->>> rm skip_thoughts_uni_2017_02_02.tar.gz
->>> python process_src/process_skip-thought.py 
-```
+## API Documentation
 
-
-Start Flask server, simply cd into `src` and run, the API will listen on `127.0.0.1:5000`
-```
-python main.py
-```
-
-To deploy with authorization, simply set environment variable `SONAR_AUTH_REQUESTS`.
-
-To deploy on Google App Engine, use `src/app.yaml`.
-
-## Document
-
-The API support both `GET`(url parameters) and `POST`(request in json format), the arguments are:
+The API support both `GET` and `POST`, the arguments are:
 
 1. `text`: the text to be encoded
 2. `type`: only `text` is supported for now
 3. `model`: the encoder model, only `cbow-glove` is supported for the moment
-
-If environment variable `SONAR_AUTH_REQUESTS` is set, you should provide these arguments for authorization:
-
-1. `user_email`: The user's email address. For security this should always be sent as an MD5 encoded string.
-2. `key`: a key return by SiteOrigin.com 
-3. `key_expire`: an expiry timestamp for the key
 
 Return data will in json format.
 ```
