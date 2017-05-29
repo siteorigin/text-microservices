@@ -10,6 +10,7 @@ import logging
 import numpy as np
 from flask import Flask
 from flask import request
+from flask import jsonify
 
 from encoders import CBOW
 from encoders import SkipThought
@@ -58,7 +59,7 @@ def main():
         data = request.args
 
     if not (data.has_key('text') and data.has_key('type') and data.has_key('model')):
-        response = {'status': 1, 'msg': 'Miss request parameters.'}
+        response = {'status': 1, 'msg': 'Missing request parameters.'}
         return json.dumps(response)
 
     req_text = data.get('text')
@@ -68,10 +69,10 @@ def main():
     # check request text length
     text_len = len(req_text.strip())
     if text_len == 0:
-        response = {'status': 1, 'msg': 'Request text is empty.'}
+        response = {'status': 1, 'msg': 'The request text is empty.'}
         return json.dumps(response)
     if text_len > 10000:
-        response = {'status': 1, 'msg': 'Request text is too long (limit in 10,000 characters).'}
+        response = {'status': 1, 'msg': 'Request text is too long (please limit to 10,000 characters).'}
         return json.dumps(response)
 
     response = {}
@@ -101,7 +102,7 @@ def main():
                     tmp_res['features'] = [float(x) for x in sent_vec]
                     tmp_res['salience'] = sent_sim
                 response['sentences'].append(tmp_res)
-    return Response(json.dumps(response), mimetype='application/json');
+    return jsonify(response);
 
 if __name__ == '__main__':
     logger.info("Running %s" % ' '.join(sys.argv))
