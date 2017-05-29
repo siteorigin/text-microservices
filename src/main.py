@@ -49,18 +49,13 @@ def auth():
 
 @app.route("/", methods=['GET', 'POST'])
 def main():
-    # if os.environ.has_key('SONAR_AUTH_REQUESTS') and not auth():
-    #     response = {'status': -1, 'msg': 'Login fail.'}
-    #     return json.dumps(response)
-
     if request.method == 'POST':
         data = request.headers
     else:
         data = request.args
 
     if not (data.has_key('text') and data.has_key('type') and data.has_key('model')):
-        response = {'status': 1, 'msg': 'Missing request parameters.'}
-        return json.dumps(response)
+        return jsonify({'status': 1, 'msg': 'Missing request parameters.'})
 
     req_text = data.get('text')
     req_type = data.get('type')
@@ -69,11 +64,9 @@ def main():
     # check request text length
     text_len = len(req_text.strip())
     if text_len == 0:
-        response = {'status': 1, 'msg': 'The request text is empty.'}
-        return json.dumps(response)
+        return jsonify({'status': 1, 'msg': 'The request text is empty.'})
     if text_len > 10000:
-        response = {'status': 1, 'msg': 'Request text is too long (please limit to 10,000 characters).'}
-        return json.dumps(response)
+        return jsonify({'status': 1, 'msg': 'Request text is too long (please limit to 10,000 characters).'})
 
     response = {}
     model = None
@@ -82,7 +75,7 @@ def main():
     if req_model == 'skip-thought':
         model = skip_thought_model
     else:
-        response = {'status': 1, 'msg': 'Model not found.'}
+        return jsonify({'status': 1, 'msg': 'Model not found.'});
 
     if model is not None:
         vector, sents, sents_vec, sents_sim = model.encode(req_text)
